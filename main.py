@@ -19,26 +19,35 @@ client = OpenAI(
 #handling command-line args
 parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User prompt")
+parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
 args = parser.parse_args()
 #Now we can access `args.user_prompt`
 
-def main():
+#it's better to write a function to get the response
+#talking to API
+def generate_content(client, messages):
+
     response = client.chat.completions.create(
-    model="openrouter/free",
-    messages=[
-        {
-            "role": "user",
-            "content": args.user_prompt
-        }
-    ])
+        model="openrouter/free",
+        messages=messages,
+    )
 
     if response.usage == None:
         raise RuntimeError("Response usage property is None")
-    else:
+    
+    if args.verbose:
+        print(f"User prompt: {messages[0]['content']}")
         print(f"Prompt tokens: {response.usage.prompt_tokens}")
         print(f"Response tokens: {response.usage.completion_tokens}")
-        print(f"Response: {response.choices[0].message.content}")
 
+    print(f"Response: {response.choices[0].message.content}")
+
+
+def main():
+    messages = [
+        {"role": "user", "content": args.user_prompt},
+    ]
+    generate_content(client, messages)
 
 if __name__ == "__main__":
     main()
