@@ -1,4 +1,4 @@
-from functions.wirte_file import *
+from functions.write_file import *
 
 print(write_file(
     "calculator", "lorem.txt", "wait, this isn't lorem ipsum"))
