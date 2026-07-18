@@ -53,13 +53,13 @@ schema_run_python_file = {
     "type": "function",
     "function": {
         "name": "run_python_file",
-        "description": "Runs python file after checking it is a valid python file",
+        "description": "responsible for running or excuting .py files",
         "parameters": {
             "type": "object",
             "properties": {
                 "file_path": {
                     "type": "string",
-                    "description": "absolute path to python file to be run",
+                    "description": "path to python file to be run",
                     },
                 "args": {
                     "type": "array",
