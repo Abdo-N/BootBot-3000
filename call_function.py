@@ -14,8 +14,17 @@ available_functions = [
 
 def call_function(tool_call, verbose: bool = False) -> dict:
     function_name = tool_call.function.name
-    function_args = json.loads(tool_call.function.arguments or "{}")
-
+    
+    try:
+        function_args = json.loads(tool_call.function.arguments or "{}")
+    except Exception as e:
+        print(f"Error while calling function: {e}")
+        return {
+            "role": "tool",
+            "tool_call_id": tool_call.id,
+            "content": f"Error: {e}",
+        }
+       
     if verbose:
         print(f" - Calling function: {function_name}({function_args})")
     else:

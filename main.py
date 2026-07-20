@@ -5,6 +5,7 @@ from openai import OpenAI
 import argparse
 from prompts import *
 from call_function import *
+import sys
 
 #loading API key from .env
 load_dotenv()
@@ -45,16 +46,18 @@ def generate_content(client, messages):
         print(f"Response tokens: {response.usage.completion_tokens}")
 
     message = response.choices[0].message
-
+    result_messages = []
     if message.tool_calls:
         for tool_call in message.tool_calls:
             result_message = call_function(tool_call=tool_call, verbose=args.verbose)
+            result_messages.append(result_message)
             if result_message["content"] == None:
                 raise Exception()
             if args.verbose:
                 print(f"-> {result_message['content']}")
     
-    print(f"Response: {response.choices[0].message.content}")
+    #print(f"Response: {response.choices[0].message.content}")
+    return message,result_messages
 
 
 def main():
@@ -62,7 +65,24 @@ def main():
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": args.user_prompt},
     ]
-    generate_content(client, messages)
+
+    for _ in range(20):
+        output,result_messages = generate_content(client, messages)
+        messages.append(output)
+        
+        for result_message in result_messages:
+            messages.append(result_message)
+        
+        # last_message = messages[len(messages) - 1]
+        # if last_message.tool_calls == None:
+        #     print(last_message.content)
+
+        if output.tool_calls == None:
+            print(output.content)
+            return
+        
+    print("Reached max iterations without final response")
+    sys.exit(1)
 
 if __name__ == "__main__":
     main()
